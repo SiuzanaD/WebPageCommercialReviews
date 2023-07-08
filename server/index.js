@@ -109,8 +109,8 @@ app.post('/login', async (req, res) => {
 app.post('/question', async (req, res) => {
   try {
     const { username, title, text, userId } = req.body;
-
     // Check if the userId is present
+
     if (!userId) {
       return res
         .status(401)
