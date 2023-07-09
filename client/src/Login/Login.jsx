@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import '../Login/Login.scss';
+import { TiLockClosed } from 'react-icons/ti';
+import { BsPersonFill } from 'react-icons/bs';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -32,7 +34,10 @@ const LoginPage = () => {
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Username:</label>
+          <label>
+            <BsPersonFill />
+            Username:
+          </label>
           <input
             type="text"
             id="username"
@@ -41,7 +46,10 @@ const LoginPage = () => {
           />
         </div>
         <div>
-          <label>Password:</label>
+          <label>
+            {' '}
+            <TiLockClosed /> Password:
+          </label>
           <input
             type="password"
             id="password"
