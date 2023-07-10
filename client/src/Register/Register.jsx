@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { AiFillHome } from 'react-icons/ai';
 import '../Register/Register.scss';
 
 const RegistrationPage = () => {
@@ -50,6 +51,9 @@ const RegistrationPage = () => {
 
   return (
     <div className="registration-page">
+      <Link to="/" className="home-button">
+        <AiFillHome />
+      </Link>
       <h2>Registration</h2>
       <form onSubmit={handleSubmit}>
         <div>

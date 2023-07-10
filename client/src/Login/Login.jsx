@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import '../Login/Login.scss';
 import { TiLockClosed } from 'react-icons/ti';
 import { BsPersonFill } from 'react-icons/bs';
+import { AiFillHome } from 'react-icons/ai';
+import '../Login/Login.scss';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -23,7 +24,7 @@ const LoginPage = () => {
 
     try {
       const response = await axios.post('/login', { username, password });
-      console.log(response.data); // Handle the successful login response
+      console.log(response.data);
     } catch (error) {
       setError(error.response.data.error); // Handle the login error
     }
@@ -31,6 +32,9 @@ const LoginPage = () => {
 
   return (
     <div className="login-page">
+      <Link to="/" className="home-button">
+        <AiFillHome />
+      </Link>
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <div>
