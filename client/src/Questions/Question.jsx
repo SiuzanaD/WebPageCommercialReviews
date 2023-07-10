@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import '../Questions/Question.scss';
+import CreateAnswerForm from '../Answers/CreateAnswer';
 
 const QuestionPage = ({ match }) => {
   const [question, setQuestion] = useState(null);
@@ -56,6 +58,21 @@ const QuestionPage = ({ match }) => {
     }
   };
 
+  const handleEditAnswer = async (answerId, newText) => {
+    try {
+      await axios.put(`/questions/${match.params.id}/answers/${answerId}`, {
+        text: newText,
+      });
+      setAnswers((prevAnswers) =>
+        prevAnswers.map((answer) =>
+          answer._id === answerId ? { ...answer, text: newText } : answer,
+        ),
+      );
+    } catch (error) {
+      console.error('Error editing answer:', error);
+    }
+  };
+
   return (
     <div>
       {question && (
@@ -82,9 +99,21 @@ const QuestionPage = ({ match }) => {
 
           {/* Display the delete button only for the owner of the answer */}
           {answer.isOwner && (
-            <button onClick={() => handleDeleteAnswer(answer._id)}>
-              Delete
-            </button>
+            <>
+              <button onClick={() => handleDeleteAnswer(answer._id)}>
+                Delete
+              </button>
+              <button
+                onClick={() => {
+                  const newText = prompt('Enter the new text:');
+                  if (newText) {
+                    handleEditAnswer(answer._id, newText);
+                  }
+                }}
+              >
+                Edit
+              </button>
+            </>
           )}
 
           <div>
@@ -97,6 +126,10 @@ const QuestionPage = ({ match }) => {
           <hr />
         </div>
       ))}
+
+      <Link to={`/questions/${match.params.id}/answers`}>Add Answer</Link>
+      {/* Render the answer creation form */}
+      <CreateAnswerForm questionId={match.params.id} />
     </div>
   );
 };

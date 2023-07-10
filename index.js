@@ -32,7 +32,7 @@ app.get('/users', async (req, res) => {
   }
 });
 
-// Parodo visus klausimus vartotoju (Rikiuoja ir duoda galimybę filtravimu )
+// +++Parodo visus klausimus vartotoju (Rikiuoja ir duoda galimybę filtravimu )
 app.get('/questions', async (req, res) => {
   try {
     const con = await client.connect();
@@ -88,7 +88,7 @@ app.get('/questions', async (req, res) => {
   }
 });
 
-// Parodo klausimo atsakymus
+// +++ Parodo klausimo atsakymus
 app.get('/question/:questionId/answers', async (req, res) => {
   const { questionId } = req.params;
 
@@ -120,7 +120,7 @@ app.get('/question/:questionId/answers', async (req, res) => {
   }
 });
 
-// Prideti nauja vartotoja
+// +++ Prideti nauja vartotoja
 app.post('/register', async (req, res) => {
   try {
     const con = await client.connect();
@@ -143,7 +143,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// prisijungimas ir login duomenu patikrinimas
+// +++ Prisijungimas ir login duomenu patikrinimas
 app.post('/login', async (req, res) => {
   try {
     const { email, password, username } = req.body;
@@ -168,7 +168,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Prideta klausima i musus duombaze (gali tik registruoti nariai)
+// +++ Prideta klausima i musus duombaze (gali tik registruoti nariai)
 app.post('/question', async (req, res) => {
   const { username, title, text } = req.body;
   const userId = req?.session?.userId;
@@ -205,7 +205,7 @@ app.post('/question', async (req, res) => {
   }
 });
 
-// Prideta atsakymą i musus duombaze (gali tik registruoti nariai)
+// ++ Prideti atsakymą i musus duombaze (gali tik registruoti nariai)
 app.post('/questions/:questionId/answers', async (req, res) => {
   try {
     const { questionId } = req.params;
@@ -248,7 +248,7 @@ app.post('/questions/:questionId/answers', async (req, res) => {
   }
 });
 
-// Prideta like prie atsakymo (gali tik registruoti nariai)
+// ++ Prideta like prie atsakymo (gali tik registruoti nariai)
 app.post('/:questionId/answers/:answerId/like', async (req, res) => {
   try {
     const { questionId, answerId } = req.params;
@@ -289,7 +289,7 @@ app.post('/:questionId/answers/:answerId/like', async (req, res) => {
   }
 });
 
-// Prideta dislike prie atsakymo (gali tik registruoti nariai)
+// ++ Prideta dislike prie atsakymo (gali tik registruoti nariai)
 app.post('/:questionId/answers/:answerId/dislike', async (req, res) => {
   try {
     const { questionId, answerId } = req.params;
@@ -331,7 +331,7 @@ app.post('/:questionId/answers/:answerId/dislike', async (req, res) => {
   }
 });
 
-// Istrina klausima is duombazes (gali tik pats klausimo savininkas, prisijunges)
+// ++++ Istrina klausima is duombazes (gali tik pats klausimo savininkas, prisijunges)
 // eslint-disable-next-line consistent-return
 app.delete('/question/:questionId', async (req, res) => {
   try {
@@ -368,7 +368,7 @@ app.delete('/question/:questionId', async (req, res) => {
   }
 });
 
-// Koreguoja klausimą (tik registruoti nariai ir klausimo savininkas, prisijunges )
+// ++  Koreguoja klausimą (tik registruoti nariai ir klausimo savininkas, prisijunges )
 // eslint-disable-next-line consistent-return
 app.patch('/questions/:questionId', async (req, res) => {
   try {
@@ -414,7 +414,7 @@ app.patch('/questions/:questionId', async (req, res) => {
   }
 });
 
-// Ištrina atsakymą (gali,tik atsakymo savininkas)
+//  ++ Ištrina atsakymą (gali,tik atsakymo savininkas)
 app.delete('/questions/:questionId/answers/:answerId', async (req, res) => {
   try {
     const { questionId, answerId } = req.params;
@@ -456,7 +456,7 @@ app.delete('/questions/:questionId/answers/:answerId', async (req, res) => {
   }
 });
 
-// Koreguoja atsakymą (gali,tik atsakymo savininkas)
+// ++ Koreguoja atsakymą (gali,tik atsakymo savininkas)
 app.patch('/questions/:questionId/answer/:answerId', async (req, res) => {
   try {
     const { questionId, answerId } = req.params;
