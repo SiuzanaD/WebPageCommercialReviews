@@ -1,4 +1,77 @@
 .questions-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f2f2f2;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-top: 0.2rem;
+
+      
+  .delete-button  {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 770px;
+    height: 12px;
+    color: #333;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+  
+    &:hover {
+         color: #f44336;
+    }
+  
+    }
+    .edit-button  {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      width: 770px;
+      height: 12px;
+      color: #333;
+      border: none;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+    
+      &:hover {
+           color: #f44336;
+      }
+    
+      }
+  .home-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    color: #333;;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+ 
+  
+    &:hover  {
+      background-color: #333;
+      color: #f2f2f2;;
+    }
+  }
+
+  .question-link {
+    display: inline-block;
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s;
+  
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
   h2 {
     text-align: center;
     margin-bottom: 20px;
@@ -36,6 +109,7 @@
     .answer-count {
       font-weight: bold;
     }
+   
 
     button {
       padding: 5px 10px;

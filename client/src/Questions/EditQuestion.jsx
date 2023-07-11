@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 const QuestionPage = ({ match }) => {
   const [question, setQuestion] = useState(null);
@@ -7,21 +8,24 @@ const QuestionPage = ({ match }) => {
   const [editMode, setEditMode] = useState(false);
   const [editedTitle, setEditedTitle] = useState('');
   const [editedText, setEditedText] = useState('');
+  const { questionId } = useParams();
 
   useEffect(() => {
     const fetchQuestion = async () => {
       try {
-        const response = await axios.get(`/questions/${match.params.id}`);
+        const response = await axios.get(
+          `http://localhost:3001/questions/${questionId}`,
+        );
         setQuestion(response.data);
       } catch (error) {
         console.error('Error fetching question:', error);
       }
     };
 
-    const fetchAnswers = async () => {
+    const fetchAnswers = async (answersId) => {
       try {
         const response = await axios.get(
-          `/questions/${match.params.id}/answers`,
+          `http://localhost:3001/questions/${answersId}/answers`,
         );
         setAnswers(response.data);
       } catch (error) {
@@ -35,7 +39,9 @@ const QuestionPage = ({ match }) => {
 
   const handleDeleteAnswer = async (answerId) => {
     try {
-      await axios.delete(`/questions/${match.params.id}/answers/${answerId}`);
+      await axios.delete(
+        `http://localhost:3001/questions/${match.params.id}/answers/${answerId}`,
+      );
       setAnswers(answers.filter((answer) => answer._id !== answerId));
     } catch (error) {
       console.error('Error deleting answer:', error);
@@ -44,7 +50,9 @@ const QuestionPage = ({ match }) => {
 
   const handleLikeAnswer = async (answerId) => {
     try {
-      await axios.post(`/${match.params.id}/answers/${answerId}/like`);
+      await axios.post(
+        `http://localhost:3001/${match.params.id}/answers/${answerId}/like`,
+      );
     } catch (error) {
       console.error('Error liking answer:', error);
     }
@@ -52,7 +60,9 @@ const QuestionPage = ({ match }) => {
 
   const handleDislikeAnswer = async (answerId) => {
     try {
-      await axios.post(`/${match.params.id}/answers/${answerId}/dislike`);
+      await axios.post(
+        `http://localhost:3001/${match.params.id}/answers/${answerId}/dislike`,
+      );
     } catch (error) {
       console.error('Error disliking answer:', error);
     }
@@ -66,7 +76,7 @@ const QuestionPage = ({ match }) => {
 
   const handleSaveQuestion = async () => {
     try {
-      await axios.put(`/questions/${match.params.id}`, {
+      await axios.put(`http://localhost:3001/questions/${match.params.id}`, {
         title: editedTitle,
         text: editedText,
       });
@@ -86,7 +96,7 @@ const QuestionPage = ({ match }) => {
   };
 
   return (
-    <div>
+    <div className="question-container ">
       {question && (
         <div>
           {editMode ? (

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { AiFillHome } from 'react-icons/ai';
 import '../Questions/AskQuestion.scss';
 
-const AddQuestionPage = () => {
+function AddQuestionPage() {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [error, setError] = useState('');
   const [createdQuestion, setCreatedQuestion] = useState(null);
-  const history = useHistory();
 
   const handleTitleChange = (event) => {
     setTitle(event.target.value);
@@ -22,7 +22,7 @@ const AddQuestionPage = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post('/question', {
+      const response = await axios.post('http://localhost:3001/question', {
         title,
         text,
       });
@@ -39,11 +39,13 @@ const AddQuestionPage = () => {
   const handleAskQuestion = () => {
     // Check if user is logged in
     const isLoggedIn = true; // Replace with actual check for logged in user
-
     if (isLoggedIn) {
       // User is logged in, show the question form
       return (
-        <div>
+        <div className="add-question-page">
+          <Link to="/" className="home-button">
+            <AiFillHome />
+          </Link>
           <h2>Add Question</h2>
           <form onSubmit={handleSubmit}>
             <div>
@@ -67,26 +69,19 @@ const AddQuestionPage = () => {
             <button type="submit">Submit</button>
           </form>
           {createdQuestion && (
-            <div>
+            <div className="success-message">
               <p>Question created successfully!</p>
               <p>
-                View the question:{' '}
-                <Link to={`/questions/${createdQuestion._id}`}>
-                  Question Link
-                </Link>
+                View <Link to={`/questions`}>All questions</Link>
               </p>
             </div>
           )}
         </div>
       );
-    } else {
-      // User is not logged in, redirect to the registration page
-      history.push('/register');
-      return null;
     }
   };
 
   return <div>{handleAskQuestion()}</div>;
-};
+}
 
 export default AddQuestionPage;

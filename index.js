@@ -1,4 +1,7 @@
+/* eslint-disable prefer-destructuring */
 const express = require('express');
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 const cors = require('cors');
 const { MongoClient, ObjectId } = require('mongodb');
 
@@ -14,7 +17,18 @@ const app = express();
 app.use(express.json()); // aplikacija moka apdoroti JSON formatu ateinancius requestus
 app.use(cors());
 
-// Parodo visus vartotojus
+app.use(
+  session({
+    store: new FileStore({
+      path: '/tmp/sessions', // Specify the directory to store session files
+    }),
+    secret: 'bnjjkh138jaijsd-12hj', // Replace with your own secret key
+    resave: false,
+    saveUninitialized: true,
+  }),
+);
+
+// ++ Parodo visus vartotojus
 app.get('/users', async (req, res) => {
   try {
     const con = await client.connect();
@@ -32,69 +46,104 @@ app.get('/users', async (req, res) => {
   }
 });
 
-// +++Parodo visus klausimus vartotoju (Rikiuoja ir duoda galimybę filtravimu )
+// +++ Parodo visus klausimus vartotoju
 app.get('/questions', async (req, res) => {
   try {
+    const sortBy = req.query.sortBy;
+    const sortOrder = req.query.sortOrder;
+    const filterOption = req.query.filter;
+    const con = await client.connect();
+    const db = client.db('Web_Reviews');
+    const collection = db.collection('Questions');
+
+    const aggregateOptions = [
+      {
+        $lookup: {
+          from: 'answers',
+          localField: '_id',
+          foreignField: 'questionId',
+          as: 'answers',
+        },
+      },
+      {
+        $addFields: {
+          answerCount: { $size: '$answers' },
+        },
+      },
+    ];
+    // const usernameOptions = [
+    //   {
+    //     $lookup: {
+    //       from: 'Users',
+    //       localField: 'username',
+    //       foreignField: 'questionId',
+    //       as: 'UserName',
+    //     },
+    //   },
+    // ];
+
+    if (filterOption === 'answered') {
+      aggregateOptions.push({ $match: { answerCount: { $gt: 0 } } });
+    } else if (filterOption === 'unanswered') {
+      aggregateOptions.push({ $match: { answerCount: { $eq: 0 } } });
+    }
+
+    if (sortBy === 'answerCount') {
+      aggregateOptions.push({
+        $sort: { answerCount: sortOrder === 'asc' ? 1 : -1 },
+      });
+    } else if (sortBy === 'createdAt') {
+      aggregateOptions.push({
+        $sort: { createdAt: sortOrder === 'asc' ? 1 : -1 },
+      });
+    }
+
+    const questions = await collection.aggregate(aggregateOptions).toArray();
+    await con.close();
+    return res.send(questions);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+});
+
+// +++ Parodo viena klausimus vartotoju
+app.get('/questions/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
     const con = await client.connect();
     const data = await con
       .db(dbName)
       .collection('Questions')
       .aggregate([
         {
-          $lookup: {
-            from: 'Answers',
-            localField: '_id',
-            foreignField: 'questionId',
-            as: 'answers',
-          },
-        },
-        {
-          // Kokia informacija parodys rezultate
-          $project: {
-            _id: 1,
-            username: 1,
-            createdDate: 1,
-            title: 1,
-            questionId: 1,
-            answerCount: {
-              $size: {
-                $ifNull: ['$answers', [{ message: 'No answers available' }]],
-              },
-            },
-          },
-        },
-        {
           $match: {
-            createdDate: { $lte: new Date() },
-            // Filtruoja pagal dat1
-            answerCount: { $gte: 0 },
-            // Filtruoja klausimus su bet kokiu atsakymų skaičiumi
+            _id: new ObjectId(id),
           },
         },
         {
-          $sort: {
-            createdDate: req.query.sortBy === 'date' ? -1 : 1,
-            // rikiuoja pagal datą
-            answerCount: req.query.sortBy === 'answers' ? -1 : 1,
-            // rikiuoja pagal atsakymus
+          $lookup: {
+            from: 'Answers', // kitos kolekcijos pavadinimas
+            localField: '_id', // owners kolekcijos raktas per kurį susijungia
+            foreignField: 'questionId', // kitos kolekcijos raktas per kurį susijungia
+            as: 'answers', // naujo rakto pavadinimas
           },
         },
       ])
       .toArray();
+
     await con.close();
-    return res.send(data);
+    res.send(data);
   } catch (error) {
-    return res.status(500).send(error);
+    res.status(500).send(error);
   }
 });
 
-// +++ Parodo klausimo atsakymus
+//  Parodo klausimo atsakymus
 app.get('/question/:questionId/answers', async (req, res) => {
   const { questionId } = req.params;
 
   try {
     const con = await client.connect();
-
     const questions = await con
       .db(dbName)
       .collection('Questions')
@@ -104,7 +153,7 @@ app.get('/question/:questionId/answers', async (req, res) => {
     const answers = await con
       .db(dbName)
       .collection('Answers')
-      .find({ questionId: { $in: questionId } })
+      .find({ questionId: { questionId } })
       .toArray();
 
     await con.close();
@@ -114,9 +163,9 @@ app.get('/question/:questionId/answers', async (req, res) => {
       answers,
     };
 
-    return res.send(data);
+    res.send(data);
   } catch (error) {
-    return res.status(500).send(error);
+    res.status(500).send(error);
   }
 });
 
@@ -124,6 +173,7 @@ app.get('/question/:questionId/answers', async (req, res) => {
 app.post('/register', async (req, res) => {
   try {
     const con = await client.connect();
+    // eslint-disable-next-line no-unused-vars
     const data = await con.db(dbName).collection('Users').insertOne({
       password: req.body.password,
       email: req.body.email,
@@ -131,32 +181,36 @@ app.post('/register', async (req, res) => {
       surname: req.body.surname,
       username: req.body.username,
     });
+
     await con.close();
-    const createdUser = data.ops[0];
-    // Prieiga prie sukurto pirmo vartotojo ops masyve
-    res.send({
-      message: 'User registered successfully',
-      user: createdUser,
-    });
+
+    res.send({ message: 'User registered successfully' });
+    // res.send(data);
   } catch (error) {
     res.status(500).send(error);
   }
 });
 
-// +++ Prisijungimas ir login duomenu patikrinimas
+// +++ Prisijungimas
 app.post('/login', async (req, res) => {
   try {
-    const { email, password, username } = req.body;
+    const { password, username } = req.body;
     const con = await client.connect();
     const user = await con
       .db(dbName)
       .collection('Users')
-      .findOne({ email, password });
+      .findOne({ username, password });
     await con.close();
     if (user) {
       const passwordMatch = password === user.password;
       if (passwordMatch) {
         res.send(`Successful login: Hello, ${username}!`);
+
+        // Save the username  in the session
+        req.session.username = username;
+        // req.session.userId = JSON.stringify(user._id);
+        // console.log(req.session.userId);
+        // res.json({ userId: req.session.userId });
       } else {
         res.status(401).send('User email or password is incorrect.');
       }
@@ -168,65 +222,61 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// +++ Prideta klausima i musus duombaze (gali tik registruoti nariai)
+// ++  Prideta klausima i musus duombaze
 app.post('/question', async (req, res) => {
-  const { username, title, text } = req.body;
-  const userId = req?.session?.userId;
+  // const userId = req?.session?.userId;
+  // console.log(userId);
   // ? if the properties in the chain is null or undefined, return undefined
 
   // Tikrina ar vartotojas prisijunges
-  if (!userId) {
-    return res
-      .status(401)
-      .send('You must be a registered user to add a question');
-  }
+  // if (!userId) {
+  //   res.status(401).send('You must be a registered user to add a question');
+  // }
   try {
-    const currentDate = new Date();
+    const { title, text } = req.body;
+    // const currentDate = new Date();
     // get the current date and time
     const con = await client.connect();
-    const data = await con
-      .db(dbName)
-      .collection('Questions')
-      .insertOne({
-        username,
-        createdDate: currentDate.toISOString(),
-        updatedDate: currentDate.toISOString(),
-        //  Convert the date to an ISO string format
-        title,
-        text,
-        answers: 0,
-        userId: new ObjectId(userId),
-        questionId: new ObjectId(req.params),
-      });
+    const data = await con.db(dbName).collection('Questions').insertOne({
+      createdDate: new Date(),
+      title,
+      text,
+      answers: 0,
+      // userId: 'User_id',
+    });
+
+    const questionId = data.insertedId.toString();
+    console.log(questionId);
+
+    res.send(data);
     await con.close();
-    return res.send(data);
   } catch (error) {
-    return res.status(500).send(error);
+    res.status(500).send(error);
   }
 });
 
-// ++ Prideti atsakymą i musus duombaze (gali tik registruoti nariai)
+//  Prideti atsakymą i musus duombaze (gali tik registruoti nariai)
 app.post('/questions/:questionId/answers', async (req, res) => {
   try {
     const { questionId } = req.params;
-    const { text } = req.body;
+    const { answertext } = req.body;
     const { userId } = req.session.userId;
     const con = await client.connect();
     const currentDate = new Date();
 
-    // Tikrina ar vartotojas prisijunges
-    if (!userId) {
-      return res
-        .status(401)
-        .send('You must be a registered user to add a answer');
-    }
+    // // Tikrina ar vartotojas prisijunges
+    // if (!userId) {
+    //   return res
+    //     .status(401)
+    //     .send('You must be a registered user to add a answer');
+    // }
     // Pridėti atsakymą
     const data = await con.db(dbName).collection('Answers').insertOne({
-      text,
+      answertext,
       questionId,
       userId,
-      createdDate: currentDate.toISOString(),
-      updatedDate: currentDate.toISOString(),
+      createdDate: currentDate(),
+      updatedDate: currentDate(),
       likes: [],
       dislikes: [],
     });
@@ -242,13 +292,13 @@ app.post('/questions/:questionId/answers', async (req, res) => {
       );
     await con.close();
 
-    return res.send(data.ops[0]);
+    return res.send(data);
   } catch (error) {
     return res.status(500).send(error);
   }
 });
 
-// ++ Prideta like prie atsakymo (gali tik registruoti nariai)
+//  Prideta like prie atsakymo (gali tik registruoti nariai)
 app.post('/:questionId/answers/:answerId/like', async (req, res) => {
   try {
     const { questionId, answerId } = req.params;
@@ -289,7 +339,7 @@ app.post('/:questionId/answers/:answerId/like', async (req, res) => {
   }
 });
 
-// ++ Prideta dislike prie atsakymo (gali tik registruoti nariai)
+//  Prideta dislike prie atsakymo (gali tik registruoti nariai)
 app.post('/:questionId/answers/:answerId/dislike', async (req, res) => {
   try {
     const { questionId, answerId } = req.params;
@@ -331,12 +381,12 @@ app.post('/:questionId/answers/:answerId/dislike', async (req, res) => {
   }
 });
 
-// ++++ Istrina klausima is duombazes (gali tik pats klausimo savininkas, prisijunges)
-// eslint-disable-next-line consistent-return
+//  ++ Istrina klausima is duombazes (gali tik pats klausimo savininkas, prisijunges)
+
 app.delete('/question/:questionId', async (req, res) => {
   try {
     const { questionId } = req.params;
-    const { userId } = req.body.userId;
+    // const { userId } = req.body.userId;
     const con = await client.connect();
     const question = await con
       .db(dbName)
@@ -344,20 +394,20 @@ app.delete('/question/:questionId', async (req, res) => {
       .findOne({ _id: new ObjectId(questionId) });
 
     // tikrina ar yra toks klausimas
-    if (!question) {
-      return res.status(404).send('Post not found');
-    }
-    // tikrina ar vartotojas yra tas pats kas sukure klausima
-    if (question.userId !== userId) {
-      return res
-        .status(401)
-        .send('You are not authorized to delete this question');
-    }
+    // if (!question) {
+    //   return res.status(404).send('Post not found');
+    // }
+    // // tikrina ar vartotojas yra tas pats kas sukure klausima
+    // if (question.userId !== userId) {
+    //   return res
+    //     .status(401)
+    //     .send('You are not authorized to delete this question');
+    // }
 
     const data = await con
       .db(dbName)
       .collection('Questions')
-      .deleteOne({ _id: new ObjectId(questionId) });
+      .deleteOne(question);
 
     if (data.deletedCount === 1) {
       await con.close();
@@ -368,7 +418,7 @@ app.delete('/question/:questionId', async (req, res) => {
   }
 });
 
-// ++  Koreguoja klausimą (tik registruoti nariai ir klausimo savininkas, prisijunges )
+//   Koreguoja klausimą (tik registruoti nariai ir klausimo savininkas, prisijunges )
 // eslint-disable-next-line consistent-return
 app.patch('/questions/:questionId', async (req, res) => {
   try {
@@ -395,7 +445,7 @@ app.patch('/questions/:questionId', async (req, res) => {
             username,
             title,
             text,
-            updatedDate: currentDate.toISOString(),
+            updatedDate: currentDate(),
           },
         },
       );
@@ -414,7 +464,7 @@ app.patch('/questions/:questionId', async (req, res) => {
   }
 });
 
-//  ++ Ištrina atsakymą (gali,tik atsakymo savininkas)
+// Ištrina atsakymą (gali,tik atsakymo savininkas)
 app.delete('/questions/:questionId/answers/:answerId', async (req, res) => {
   try {
     const { questionId, answerId } = req.params;
@@ -456,7 +506,7 @@ app.delete('/questions/:questionId/answers/:answerId', async (req, res) => {
   }
 });
 
-// ++ Koreguoja atsakymą (gali,tik atsakymo savininkas)
+//  Koreguoja atsakymą (gali,tik atsakymo savininkas)
 app.patch('/questions/:questionId/answer/:answerId', async (req, res) => {
   try {
     const { questionId, answerId } = req.params;
@@ -489,7 +539,7 @@ app.patch('/questions/:questionId/answer/:answerId', async (req, res) => {
       .collection('Answers')
       .updateOne(
         { _id: new ObjectId(answerId) },
-        { $set: { text, updatedDate: currentDate.toISOString() } },
+        { $set: { text, updatedDate: currentDate() } },
       );
 
     await con.close();

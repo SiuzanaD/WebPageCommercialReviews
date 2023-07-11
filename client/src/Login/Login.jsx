@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { TiLockClosed } from 'react-icons/ti';
 import { BsPersonFill } from 'react-icons/bs';
@@ -10,6 +10,7 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
@@ -23,10 +24,14 @@ const LoginPage = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post('/login', { username, password });
+      const response = await axios.post('http://localhost:3001/login', {
+        username,
+        password,
+      });
       console.log(response.data);
+      navigate('/questions');
     } catch (error) {
-      setError(error.response.data.error); // Handle the login error
+      setError(error.response.data.error);
     }
   };
 

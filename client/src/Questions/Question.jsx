@@ -11,7 +11,9 @@ const QuestionPage = ({ match }) => {
   useEffect(() => {
     const fetchQuestion = async () => {
       try {
-        const response = await axios.get(`/questions/${match.params.id}`);
+        const response = await axios.get(
+          `http://localhost:3001/questions/${question._id}`,
+        );
         setQuestion(response.data);
       } catch (error) {
         console.error('Error fetching question:', error);
@@ -21,7 +23,7 @@ const QuestionPage = ({ match }) => {
     const fetchAnswers = async () => {
       try {
         const response = await axios.get(
-          `/questions/${match.params.id}/answers`,
+          `http://localhost:3001/questions/${question._id}/answers`,
         );
         setAnswers(response.data);
       } catch (error) {
@@ -31,11 +33,13 @@ const QuestionPage = ({ match }) => {
 
     fetchQuestion();
     fetchAnswers();
-  }, [match.params.id]);
+  });
 
   const handleDeleteAnswer = async (answerId) => {
     try {
-      await axios.delete(`/questions/${match.params.id}/answers/${answerId}`);
+      await axios.delete(
+        `http://localhost:3001/questions/${question._id}/answers/${answerId}`,
+      );
       setAnswers(answers.filter((answer) => answer._id !== answerId));
     } catch (error) {
       console.error('Error deleting answer:', error);
@@ -44,7 +48,9 @@ const QuestionPage = ({ match }) => {
 
   const handleLikeAnswer = async (answerId) => {
     try {
-      await axios.post(`/${match.params.id}/answers/${answerId}/like`);
+      await axios.post(
+        `http://localhost:3001/${question._id}/answers/${answerId}/like`,
+      );
     } catch (error) {
       console.error('Error liking answer:', error);
     }
@@ -52,7 +58,9 @@ const QuestionPage = ({ match }) => {
 
   const handleDislikeAnswer = async (answerId) => {
     try {
-      await axios.post(`/${match.params.id}/answers/${answerId}/dislike`);
+      await axios.post(
+        `http://localhost:3001/${question._id}/answers/${answerId}/dislike`,
+      );
     } catch (error) {
       console.error('Error disliking answer:', error);
     }
@@ -60,9 +68,12 @@ const QuestionPage = ({ match }) => {
 
   const handleEditAnswer = async (answerId, newText) => {
     try {
-      await axios.put(`/questions/${match.params.id}/answers/${answerId}`, {
-        text: newText,
-      });
+      await axios.put(
+        `http://localhost:3001/questions/${question._id}/answers/${answerId}`,
+        {
+          text: newText,
+        },
+      );
       setAnswers((prevAnswers) =>
         prevAnswers.map((answer) =>
           answer._id === answerId ? { ...answer, text: newText } : answer,
@@ -74,7 +85,7 @@ const QuestionPage = ({ match }) => {
   };
 
   return (
-    <div>
+    <div className="question-page">
       {question && (
         <div>
           <h2>{question.title}</h2>
@@ -127,7 +138,9 @@ const QuestionPage = ({ match }) => {
         </div>
       ))}
 
-      <Link to={`/questions/${match.params.id}/answers`}>Add Answer</Link>
+      <Link to={`http://localhost:3001/questions/${match.params.id}/answers`}>
+        Add Answer
+      </Link>
       {/* Render the answer creation form */}
       <CreateAnswerForm questionId={match.params.id} />
     </div>

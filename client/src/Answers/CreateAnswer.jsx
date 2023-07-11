@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import '../Answers/CreateAnswers.scss';
+import '../Answers/CreateAnswer.scss';
 
-const CreateAnswerForm = ({ questionId }) => {
+const CreateAnswerForm = () => {
   const [answerText, setAnswerText] = useState('');
-
-  const handleAnswerTextChange = (e) => {
-    setAnswerText(e.target.value);
-  };
+  const [{ questionId }] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await axios.post(`/questions/${questionId}/answers`, {
-        text: answerText,
-      });
+      await axios.post(
+        `http://localhost:3001/question/${questionId}/answers`,
 
-      setAnswerText('');
+        {
+          text: answerText,
+        },
+      );
     } catch (error) {
       console.error('Error creating answer:', error);
     }
@@ -26,8 +25,9 @@ const CreateAnswerForm = ({ questionId }) => {
   return (
     <form className="create-answer-form" onSubmit={handleSubmit}>
       <textarea
+        id="content"
         value={answerText}
-        onChange={handleAnswerTextChange}
+        onChange={(e) => setAnswerText(e.target.value)}
         placeholder="Your answer..."
       ></textarea>
       <button type="submit">Submit Answer</button>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AiFillHome } from 'react-icons/ai';
 import '../Register/Register.scss';
@@ -11,6 +11,7 @@ const RegistrationPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleNameChange = (event) => {
     setName(event.target.value);
@@ -36,16 +37,17 @@ const RegistrationPage = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post('/register', {
+      const response = await axios.post('http://localhost:3001/register', {
         name,
         surname,
         username,
         email,
         password,
       });
-      console.log(response.data); // Handle the successful registration response
+      console.log(response.data);
+      navigate('/questions');
     } catch (error) {
-      setError(error.response.data.error); // Handle the registration error
+      setError(error.response.data.error);
     }
   };
 
