@@ -100,3 +100,18 @@ A few of the things see in one Question page :
 - Can add new answer
 
 - See all question information
+
+<a  href="#">
+
+<img  alt="Edit answer form"  title="Edit answer form"  src="./client/images/ReadmeImaged/Edit_Answer.png"  width="600">
+
+</a>
+</p>
+
+## Features for Edit / Add answer
+
+A few of the things do with answers:
+
+- If you owner of answer/comment you can delete or edit
+
+- Creation date and updated date (writing that date are updated)

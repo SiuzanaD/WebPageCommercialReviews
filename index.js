@@ -206,7 +206,7 @@ app.get('/questions/:id', async (req, res) => {
   }
 });
 
-app.post('/questions', async (req, res) => {
+app.post('/questions/add', async (req, res) => {
   try {
     const con = await client.connect();
     const { question, title, userId } = req.body;

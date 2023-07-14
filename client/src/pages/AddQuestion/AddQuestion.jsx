@@ -19,7 +19,7 @@ const AddQuestion = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3001/questions', {
+      const response = await fetch('http://localhost:3001/questions/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question, title, userId }),
