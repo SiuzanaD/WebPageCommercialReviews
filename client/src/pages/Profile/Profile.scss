@@ -1,0 +1,40 @@
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #333;
+
+    
+  .block{
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    width: 400px;
+  
+    div {
+
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 16px;
+  
+      p {
+        margin-bottom: 8px;
+      }
+    }
+    h1{
+        color:#333;
+    }
+  
+    button {
+      color: #fff;
+      background-color: #333;
+  
+      &:hover {
+        background-color: #fff;
+        color:#333 ;
+      }
+    }
+  }}
+  

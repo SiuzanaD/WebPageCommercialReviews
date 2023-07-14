@@ -1,0 +1,49 @@
+.register {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #333;
+
+    form {
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+        padding: 16px;
+        border-radius: 4px;
+        width: 300px;
+        div {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 16px;
+        
+            label {
+              margin-bottom: 4px;
+              color: #333;
+              font-weight: bold;
+            }
+        
+            input[type="text"],
+            input[type="password"] {
+              padding: 10px;
+              border: 1px solid #333;
+              border-radius: 4px;
+            }
+          }
+          .error {
+            color: red;
+            font-size: 14px;
+            margin-bottom: 16px;
+          }
+        
+          button {
+            margin-bottom: 16px;
+          }
+        
+          a {
+            text-decoration: none;
+          }
+     
+    }
+
+}

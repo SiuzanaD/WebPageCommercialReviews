@@ -1,20 +1,11 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import LoginPage from './Login/Login';
-import RegistrationPage from './Register/Register';
-import AskQuestion from './Questions/AskQuestion';
-import AllQuestion from './Questions/AllQuestions';
-import Main from './Main/Main';
+import Routes from "./routes/Routes";
+import Providers from "./context/Providers";
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Main />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegistrationPage />} />
-      <Route path="/question" element={<AskQuestion />} />
-      <Route path="/questions" element={<AllQuestion />} />
-    </Routes>
+    <Providers>
+      <Routes />
+    </Providers>
   );
 };
 

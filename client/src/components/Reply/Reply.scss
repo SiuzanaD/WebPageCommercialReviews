@@ -1,0 +1,44 @@
+.reply {
+  
+    p {
+      color: #333;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+  
+    form {
+      label {
+        display: flex;
+        color: #333;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+  
+      textarea {
+        width: 98%;
+        padding: 8px;
+        border: 1px solid #333;
+        border-radius: 4px;
+        resize: vertical;
+        margin-bottom: 16px;
+      }
+    
+      div {
+        display: flex;
+        justify-content: flex-end;
+  
+        button {
+          color: #fff;
+          background-color: #333;
+        
+ 
+          
+  
+          &:hover {
+            background-color: #222;
+          }
+        }
+      }
+    }
+  }
+  
