@@ -5,7 +5,7 @@ Web Page Commercial Reviews  Built with Node and React .</p>
 
 <a  href="#">
 
-<img  alt="Login form"  title="Login form"  src="./client/images/ReadmeImaged//Login form.png"  width="400">
+<img  alt="Login form"  title="Login form"  src="./client/images/ReadmeImaged//Login form.png"  width="600">
 
 </a>
 </p>
@@ -20,7 +20,7 @@ A few of the things Login have:
 
 - Save login information
 
-<a  href="#">
+<a  align="center" href="#">
 
 <img  alt="Login form"  title="Login form"  src="./client/images/ReadmeImaged//Login form.png"  width="600">
 
